@@ -8,7 +8,7 @@
 '''
 from configparser import ConfigParser
 from threading import Timer
-import requests 
+import requests
 import random
 import hashlib
 import datetime
@@ -21,7 +21,7 @@ grade = [10,40,70,130,200,400,1000,3000,8000,20000]
 api = ''
 
 class Task(object):
-    
+
     '''
     对象的构造函数
     '''
@@ -103,8 +103,9 @@ class Task(object):
         if self.sckey == '':
             return
         url = 'https://sc.ftqq.com/' + self.sckey + '.send'
-        self.diyText() # 构造发送内容
-        response = requests.get(url,params={"text":self.title, "desp":self.content})
+        # 构造发送内容
+        self.diyText()
+        response = requests.get(url, params={"text":self.title, "desp":self.content})
         data = json.loads(response.text)
         if data['errno'] == 0:
             self.log('用户:' + self.name + '  Server酱推送成功')
@@ -120,9 +121,13 @@ class Task(object):
     '''
     def diyText(self):
         today = datetime.date.today()
-        kaoyan_day = datetime.date(2020,12,21) #2021考研党的末日
+
+        #2021考研党的末日
+
+        kaoyan_day = datetime.date(2020, 12, 21)
         date = (kaoyan_day - today).days
-        one = requests.get('https://api.qinor.cn/soup/').text # 每日一句的api
+        # 每日一句的api
+        one = requests.get('https://api.qinor.cn/soup/').text
         for count in grade:
             if self.level < 10:
                 if self.listenSongs < 20000:
@@ -178,8 +183,8 @@ class Task(object):
         else:
             self.log('用户:' + self.name + '  今日任务已完成')
             logger.info('用户:' + self.name + '  今日任务已完成========================================')
-            
-        
+
+
 '''
 初始化：读取配置,配置文件为init.config
 返回字典类型的配置对象
@@ -199,7 +204,7 @@ def init():
             'uin': uin,
             'pwd': pwd,
             'api': api,
-            'md5Switch': md5Switch, 
+            'md5Switch': md5Switch,
             'peopleSwitch':peopleSwitch,
             'sckey':sckey
         }
@@ -239,7 +244,7 @@ def check():
 任务池
 '''
 def taskPool():
-    
+
     config = init()
     check() # 每天对api做一次检查
     if config['peopleSwitch'] is True:

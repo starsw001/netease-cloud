@@ -27,7 +27,6 @@ class Task(object):
     '''
     对象的构造函数
     '''
-
     def __init__(self, uin, pwd, sckey):
         self.uin = uin
         self.pwd = pwd
@@ -39,7 +38,6 @@ class Task(object):
     postJson:要以post方式发送的数据
     返回response
     '''
-
     def getResponse(self, url, postJson):
         response = requests.post(url, data=postJson, headers={'Content-Type': 'application/x-www-form-urlencoded'},
                                  cookies=self.cookies)
@@ -48,7 +46,6 @@ class Task(object):
     '''
     登陆
     '''
-
     def login(self):
         data = {"uin": self.uin, "pwd": self.pwd, "r": random.random()}
         if '@' in self.uin:
@@ -151,23 +148,20 @@ class Task(object):
             state = self.error
             self.title = '网易云听歌任务出现问题！'
         self.content = ("> tip:等级数据每天下午2点更新 \n\n"
-                        "------\n"
-                        "| 用户名   | " + str(self.name) + " |\n"
-                                                        "| -------- | :----------------: |\n"
-                                                        "| 当前等级 |        " + str(self.level) + "级         |\n"
-                                                                                               "| 累计播放 |       " + str(
-            self.listenSongs) + "首       |\n"
-                                "| 升级提示 |      " + self.tip + "       |\n"
-                                                              "------\n"
-                                                              "### 任务状态\n" + str(state) + "\n\n"
-                                                                                          "### 考研倒计时\n距考研还有" + str(
-            date) + "天，主人要加油学习啊\n"
-                    "### 今日一句\n" + one + "\n\n")
+            "------\n"
+            "| 用户名   | " + str(self.name) + " |\n"
+            "| -------- | :----------------: |\n"
+            "| 当前等级 |        " + str(self.level) + "级         |\n"
+            "| 累计播放 |       " + str(self.listenSongs) + "首       |\n"
+            "| 升级提示 |      " + self.tip + "       |\n"
+            "------\n"
+            "### 任务状态\n" + str(state) + "\n\n"
+            "### 考研倒计时\n距考研还有" + str(date) + "天，主人要加油学习啊\n"
+            "### 今日一句\n" + one + "\n\n")
 
     '''
     打印日志
     '''
-
     def log(self, text):
         time_stamp = datetime.datetime.now()
         print(time_stamp.strftime('%Y.%m.%d-%H:%M:%S') + '   ' + str(text))
@@ -175,7 +169,6 @@ class Task(object):
     '''
     开始执行
     '''
-
     def start(self):
         try:
             self.login()
