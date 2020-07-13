@@ -19,7 +19,9 @@ import logging
 logFile = open("run.log", encoding="utf-8", mode="a")
 logging.basicConfig(stream=logFile, format="%(asctime)s %(name)s:%(levelname)s:%(message)s",
                     datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
+#
 grade = [10, 40, 70, 130, 200, 400, 1000, 3000, 8000, 20000]
+# api 接口地址
 api = ''
 
 
@@ -67,7 +69,6 @@ class Task(object):
     '''
     每日签到
     '''
-
     def sign(self):
         url = api + '?do=sign'
         response = self.getResponse(url, {"r": random.random()})
@@ -82,7 +83,6 @@ class Task(object):
     '''
     每日打卡300首歌
     '''
-
     def daka(self):
         url = api + '?do=daka'
         response = self.getResponse(url, {"r": random.random()})
@@ -91,7 +91,6 @@ class Task(object):
     '''
     查询用户详情
     '''
-
     def detail(self):
         url = api + '?do=detail'
         data = {"uid": self.uid, "r": random.random()}
@@ -105,7 +104,6 @@ class Task(object):
     '''
     Server推送
     '''
-
     def server(self):
         if self.sckey == '':
             return
@@ -125,7 +123,6 @@ class Task(object):
     title:消息的标题
     content:消息的内容,支持MarkDown格式
     '''
-
     def diyText(self):
         today = datetime.date.today()
         kaoyan_day = datetime.date(2020, 12, 21)  # 2021考研党的末日
@@ -194,8 +191,6 @@ class Task(object):
 初始化：读取配置,配置文件为init.config
 返回字典类型的配置对象
 '''
-
-
 def init():
     global api  # 初始化时设置api
     config = ConfigParser()
@@ -224,8 +219,6 @@ MD5加密
 str:待加密字符
 返回加密后的字符
 '''
-
-
 def md5(str):
     hl = hashlib.md5()
     hl.update(str.encode(encoding='utf-8'))
@@ -236,8 +229,6 @@ def md5(str):
 加载Json文件
 jsonPath:json文件的名字,例如account.json
 '''
-
-
 def loadJson(jsonPath):
     with open(jsonPath, encoding='utf-8') as f:
         account = json.load(f)
@@ -247,7 +238,6 @@ def loadJson(jsonPath):
 '''
 检查api
 '''
-
 def check():
     url = api + '?do=check'
     respones = requests.get(url)
