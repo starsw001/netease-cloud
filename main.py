@@ -125,7 +125,7 @@ class Task(object):
     '''
     def diyText(self):
         today = datetime.date.today()
-        kaoyan_day = datetime.date(2020, 12, 21)  # 2021考研党的末日
+        kaoyan_day = datetime.date(2021, 12, 21)  # 2021考研党的末日
         date = (kaoyan_day - today).days
         one = requests.get('https://api.qinor.cn/soup/').text  # 每日一句的api
         for count in grade:
@@ -172,12 +172,13 @@ class Task(object):
             self.sign()
             self.detail()
             # 如果你的等级比较高，然后使用这个发现每次都没有听满300首，那么你可以修改程序的start函数（165行左右）的打卡次数，将3改大点，比如改到6就可以打卡6次
-            for i in range(1, 4):
+            for i in range(1, 6):
                 self.daka()
                 self.log('用户:' + self.name + '  第' + str(i) + '次打卡成功,即将休眠10秒')
                 logging.info('用户:' + self.name + '  第' + str(i) + '次打卡成功,即将休眠10秒')
                 # 如果你嫌打卡速度慢了，可以修改休眠时间，30秒改为10秒之类的，请自行调试
                 time.sleep(10)
+            # 发推送信息到微信
             self.server()
         except:
             self.log('用户任务执行中断,请检查账号密码是否正确')
@@ -252,7 +253,6 @@ def check():
 '''
 任务池
 '''
-
 def taskPool():
     config = init()
     check()  # 每天对api做一次检查
