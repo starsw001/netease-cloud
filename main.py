@@ -4,7 +4,7 @@
 @LastEditors: ZainCheung
 @description:网易云音乐全自动每日打卡300首歌升级账号等级,使用前请先到init.config文件配置
 @Date: 2020-06-25 14:28:48
-@LastEditTime: 2020-06-26 17:38:18
+@LastEditTime: 2020-09-01 18:20:00
 '''
 from configparser import ConfigParser
 from threading import Timer
@@ -15,9 +15,15 @@ import datetime
 import time
 import json
 import logging
+import math
+import os
 
+'''
+使用绝对路径时，切换到项目的当前目录。
+'''
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 logFile = open("run.log", encoding="utf-8", mode="a")
-logging.basicConfig(stream=logFile, format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
+logging.basicConfig(stream=logFile, format="%(asctime)s %(levelname)s:%(message)s", datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
 grade = [10,40,70,130,200,400,1000,3000,8000,20000]
 api = ''
 
@@ -26,9 +32,10 @@ class Task(object):
     '''
     对象的构造函数
     '''
-    def __init__(self, uin, pwd, sckey):
+    def __init__(self, uin, pwd, sckey, countrycode=86):
         self.uin = uin
         self.pwd = pwd
+        self.countrycode = countrycode
         self.sckey = sckey
 
     '''
@@ -42,10 +49,10 @@ class Task(object):
         return response
 
     '''
-    登陆
+    登录
     '''
     def login(self):
-        data = {"uin":self.uin,"pwd":self.pwd,"r":random.random()}
+        data = {"uin":self.uin,"pwd":self.pwd,"countrycode":self.countrycode,"r":random.random()}
         if '@' in self.uin:
             url = api + '?do=email'
         else:
@@ -57,10 +64,10 @@ class Task(object):
         if code==200:
             self.error = ''
         else:
-            self.error = '登陆失败，请检查账号'
+            self.error = '登录失败，请检查账号'
         self.cookies = response.cookies.get_dict()
-        self.log('登陆成功')
-        logging.info("登陆成功")
+        self.log('登录成功')
+        logging.info("登录成功")
 
     '''
     每日签到
@@ -120,9 +127,9 @@ class Task(object):
     content:消息的内容,支持MarkDown格式
     '''
     def diyText(self):
-        today = datetime.date.today()
-        kaoyan_day = datetime.date(2020,12,21) #2021考研党的末日
-        date = (kaoyan_day - today).days
+        # today = datetime.date.today()
+        # kaoyan_day = datetime.date(2020,12,21) #2021考研党的末日
+        # date = (kaoyan_day - today).days
         one = requests.get('https://api.qinor.cn/soup/').text # 每日一句的api
         for count in grade:
             if self.level < 10:
@@ -131,26 +138,33 @@ class Task(object):
                         self.tip = '还需听歌' + str(count-self.listenSongs) + '首即可升级'
                         break
                 else:
-                    self.tip = '你已经听够20000首歌曲,如果登陆天数达到800天即可满级'
+                    self.tip = '你已经听够20000首歌曲,如果登录天数达到800天即可满级'
             else:
                 self.tip = '恭喜你已经满级!'
         if self.error == '':
-            state = '目前已完成签到，300百首歌也已听完'
-            self.title = '网易云听歌任务已完成'
+            state = ("- 目前已完成签到\n"
+                     "- 今日共打卡" + str(self.dakanum) + "次\n"
+                     "- 今日共播放" + str(self.dakaSongs) + "首歌\n"
+                     "- 还需要打卡" + str(self.day) +"天")
+            self.title = ("网易云今日打卡" + str(self.dakaSongs) + "首，已播放" + str(self.listenSongs) + "首")
         else:
             state = self.error
             self.title = '网易云听歌任务出现问题！'
-        self.content = ("> tip:等级数据每天下午2点更新 \n\n"
+        self.content = (
             "------\n"
-            "| 用户名   | " + str(self.name) + " |\n"
-            "| -------- | :----------------: |\n"
-            "| 当前等级 |        " + str(self.level) + "级         |\n"
-            "| 累计播放 |       " + str(self.listenSongs) + "首       |\n"
-            "| 升级提示 |      " + self.tip + "       |\n"
+            "#### 账户信息\n"
+            "- 用户名称：" + str(self.name) + "\n"
+            "- 当前等级：" + str(self.level) + "级\n"
+            "- 累计播放：" + str(self.listenSongs) + "首\n"
+            "- 升级提示：" + self.tip + "\n\n"
             "------\n"
-            "### 任务状态\n" + str(state) + "\n\n"
-            "### 考研倒计时\n距考研还有" + str(date) + "天，主人要加油学习啊\n"
-            "### 今日一句\n" + one + "\n\n")
+            "#### 任务状态\n" + str(state) + "\n\n"
+            "------\n"
+            "#### 注意事项\n- 网易云音乐等级数据每天下午2点更新 \n\n"
+            "------\n"
+            "#### 打卡日志\n" + self.dakaSongs_list + "\n\n"
+            "------\n"
+            "#### 今日一句\n- " + one + "\n\n")
 
     '''
     打印日志
@@ -158,20 +172,42 @@ class Task(object):
     def log(self, text):
         time_stamp = datetime.datetime.now()
         print(time_stamp.strftime('%Y.%m.%d-%H:%M:%S') + '   ' + str(text))
+        self.time =time_stamp.strftime('%H:%M:%S')
+        self.list.append("- [" + self.time + "]    " + str(text) + "\n\n")
 
     '''
     开始执行
     '''
     def start(self):
         try:
+            self.list = []
+            self.list.append("- 初始化完成\n\n")
             self.login()
             self.sign()
             self.detail()
-            for i in range(1,4):
+            counter  = self.listenSongs
+            self.list.append("- 开始打卡\n\n")
+            for i in range(1,10):
                 self.daka()
-                self.log('用户:' + self.name + '  第' + str(i) + '次打卡成功,即将休眠30秒')
+               # self.log('用户:' + self.name + '  第' + str(i) + '次打卡成功,即将休眠30秒')
+                self.log('第' + str(i) + '次打卡成功')
                 logging.info('用户:' + self.name + '  第' + str(i) + '次打卡成功,即将休眠30秒')
-                time.sleep(30)
+                time.sleep(10)
+                self.dakanum =i
+                self.detail()
+                self.dakaSongs = self.listenSongs - counter
+                self.log('今日已打卡' + str(self.dakaSongs) + '首')
+                if self.dakaSongs == 300:
+                    break
+
+            if self.listenSongs >= 20000:
+                self.day = 0
+            else:
+                self.day = math.ceil((20000 - self.listenSongs)/300)
+            
+            self.list.append("- 打卡结束\n\n")
+            self.list.append("- 消息推送\n\n")
+            self.dakaSongs_list = ''.join(self.list)
             self.server()
         except:
             self.log('用户任务执行中断,请检查账号密码是否正确')
@@ -191,6 +227,7 @@ def init():
     config.read('init.config', encoding='UTF-8-sig')
     uin = config['token']['account']
     pwd = config['token']['password']
+    countrycode = config['token']['countrycode']
     api = config['setting']['api']
     md5Switch = config.getboolean('setting','md5Switch')
     peopleSwitch = config.getboolean('setting','peopleSwitch')
@@ -200,6 +237,7 @@ def init():
     conf = {
             'uin': uin,
             'pwd': pwd,
+            'countrycode': countrycode,
             'api': api,
             'md5Switch': md5Switch, 
             'peopleSwitch':peopleSwitch,
@@ -265,7 +303,7 @@ def taskPool():
             print('MD5开关已打开,即将开始为你加密,密码不会上传至服务器,请知悉')
             logging.info('MD5开关已打开,即将开始为你加密,密码不会上传至服务器,请知悉')
             config['pwd'] = md5(config['pwd'])
-        task = Task(config['uin'], config['pwd'], config['sckey'])
+        task = Task(config['uin'], config['pwd'], config['sckey'], config['countrycode'])
         task.start()
 
 '''

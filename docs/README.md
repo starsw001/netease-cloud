@@ -11,12 +11,6 @@
 
 ------
 
-
-
-### 使用文档: https://zaincheung.gitee.io/netease-cloud
-
-
-
 目前已实现功能：
 
 
@@ -26,11 +20,8 @@
 
 本项目实则由三个项目组成，分别是：
 
-- 给账号升级的Python项目：[netease-cloud](https://github.com/ZainCheung/netease-cloud)
+?>给账号升级的Python项目：[netease-cloud](https://github.com/ZainCheung/netease-cloud)
 
-- 使用PHP搭建的API接口：[netease-cloud-api](https://github.com/ZainCheung/netease-cloud-api)
+?>使用PHP搭建的API接口：[netease-cloud-api](https://github.com/ZainCheung/netease-cloud-api)
 
-- 使用Python开发的修改日推（每日推荐歌曲）Windows软件：[netease-cloud-fast](https://github.com/ZainCheung/netease-cloud-fastplay)
-
-### 接口征集活动
-https://github.com/ZainCheung/netease-cloud-api/issues/31
+?>使用Python开发的修改日推（每日推荐歌曲）Windows软件：[netease-cloud-fast](https://github.com/ZainCheung/netease-cloud-fastplay)
