@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 [
     {
         "account": "starsw001@163.com",
         "password": "eadccc55aaa55824e4b195bc486c7477",
         "sckey": "SCU103309T5fae0d466cde0dd77a82d35f2c5cbef75efaa5ddab0cb"
     }
+=======
+[
+    {
+        "account": "starsw001@163.com",
+        "password": "eadccc55aaa55824e4b195bc486c7477",
+        "sckey": "SCU103309T5fae0d466cde0dd77a82d35f2c5cbef75efaa5ddab0cb"
+    }
+>>>>>>> origin
 ]
